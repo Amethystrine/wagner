@@ -1,0 +1,7 @@
+test1:2ms
+test2:4346ms
+test3:36ms
+test4:
+area10:0.607714
+area100:0.915665
+1ms
