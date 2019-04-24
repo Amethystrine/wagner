@@ -6,8 +6,8 @@
 
 namespace WagnerTorusGraphs {
 
-using NodeIndex = int;  //グラフのノード（点）を表すイテレータ
-using EdgeIndex = short;  //ノード毎のエッジ（辺）を表すイテレータ
+using NodeIndex = int;  //グラフのノード（点）を表す要素数
+using EdgeIndex = short;  //ノード毎のエッジ（辺）を表す要素数
 using Vec2d = double[2];
 enum { X, Y };
 
@@ -37,7 +37,7 @@ class NodeInfo {
   friend class WagnerTorusGraphsLib;
 protected:
   std::vector<NodeIndex> accessnodelist_vector_;  // IDListと同期。反時計回り順に登録する
-  std::vector<EdgeID> accessidlist_vector_;  // NodeListと同じイテレータの接続情報。反時計回り順に登録する
+  std::vector<EdgeID> accessidlist_vector_;  // NodeListと同じ要素数の接続情報。反時計回り順に登録する
 public:
   Vec2d xy_coord_; // ノードの二次元情報（必須）
   void* infoparam_; // ノードの個別情報ポインタ（任意）
@@ -61,12 +61,12 @@ public:
   inline EdgeID GetID(EdgeIndex edge) {
     return accessidlist_vector_[(edge + accessnodelist_vector_.size()) % accessnodelist_vector_.size()];
   }
-  // 該当するEdgeLineイテレータの直後に、エッジを追加
+  // 該当するEdgeLine要素数の直後に、エッジを追加
   void AddEdge(NodeIndex node, EdgeID ID, EdgeIndex edge) {
     accessnodelist_vector_.insert(accessnodelist_vector_.begin() + edge, node);
     accessidlist_vector_.insert(accessidlist_vector_.begin() + edge, ID);
   }
-  // 該当するEdgeLineイテレータを削除
+  // 該当するEdgeLine要素数を削除
   void EraseEdge(EdgeIndex edge) {
     accessnodelist_vector_.erase(accessnodelist_vector_.begin() + edge);
     accessidlist_vector_.erase(accessidlist_vector_.begin() + edge);

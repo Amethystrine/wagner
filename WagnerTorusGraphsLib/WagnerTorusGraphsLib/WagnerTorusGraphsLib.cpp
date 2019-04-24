@@ -424,7 +424,7 @@ bool WagnerTorusGraphsLib::IsStraight(NodeTriangle tri) {
   return IsStraight(nodelist_vector_[tri[0]].xy_coord_, nodelist_vector_[tri[1]].xy_coord_, nodelist_vector_[tri[2]].xy_coord_);
 }
 
-//反時計回り 直線または凹角がないか探索し、あった場合はその角のイテレータを返す
+//反時計回り 直線または凹角がないか探索し、あった場合はその角の要素数を返す
 int WagnerTorusGraphsLib::QuadrantHasReentrant(NodeQuadrangle quad) {
   for (int iVertex = 0; iVertex < 4; iVertex++) {
     NodeTriangle tri = { quad[(iVertex + 3) % 4],quad[iVertex],quad[(iVertex + 1) % 4] };
