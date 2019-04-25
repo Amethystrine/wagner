@@ -217,8 +217,9 @@ void WagnerTorusGraphsLib::GetEdge(void* param, GetEdgeFunc func) {
       if (i_node < j_node) {
         Vec2d coord[2] = { {nodelist_vector_[i_node].xy_coord_[X], nodelist_vector_[i_node].xy_coord_[Y]},
                         {nodelist_vector_[j_node].xy_coord_[X], nodelist_vector_[j_node].xy_coord_[Y]} };
-        void* infoparam[2] = { nodelist_vector_[i_node].infoparam_, nodelist_vector_[j_node].infoparam_ };
-        func(param, coord, infoparam);
+        void* infoparam[2] = { nodelist_vector_[i_node].infoparam_, nodelist_vector_[j_node].infoparam_ };        
+        EdgeID ID = nodelist_vector_[i_node].GetID(j_node);
+        func(param, coord, infoparam, ID);
       }
     }
   }
@@ -234,7 +235,8 @@ void WagnerTorusGraphsLib::GetTriangle(void* param, GetTriangleFunc func) {
                         {nodelist_vector_[j_node].xy_coord_[X], nodelist_vector_[j_node].xy_coord_[Y]},
                         {nodelist_vector_[k_node].xy_coord_[X], nodelist_vector_[k_node].xy_coord_[Y]} };
         void* infoparam[3] = { nodelist_vector_[i_node].infoparam_, nodelist_vector_[j_node].infoparam_, nodelist_vector_[k_node].infoparam_ };
-        func(param, coord, infoparam);
+        EdgeID ID[3] = { nodelist_vector_[i_node].GetID(j_node), nodelist_vector_[j_node].GetID(k_node), nodelist_vector_[k_node].GetID(i_node) };
+        func(param, coord, infoparam, ID);
       }
     }
   }
@@ -419,6 +421,9 @@ bool WagnerTorusGraphsLib::IsLevorotation(NodeTriangle tri) {
 bool WagnerTorusGraphsLib::IsStraight(Vec2d coord1, Vec2d coord2, Vec2d coord3) {
   return (coord2[X] * coord3[Y] - coord2[X] * coord1[Y] - coord1[X] * coord3[Y]
     - coord2[Y] * coord3[X] + coord2[Y] * coord1[X] + coord1[Y] * coord3[X]) == 0;
+  //double inner = (coord2[X] - coord1[X]) * (coord3[X] - coord1[X]) + (coord2[Y] - coord1[Y]) * (coord3[Y] - coord1[Y]);
+  //return inner * inner > ((coord2[X] - coord1[X]) * (coord2[X] - coord1[X]) + (coord2[Y] - coord1[Y]) * (coord2[Y] - coord1[Y])) *
+  //                       ((coord3[X] - coord1[X]) * (coord3[X] - coord1[X]) + (coord3[Y] - coord1[Y]) * (coord3[Y] - coord1[Y])) * (1 - kStraightSin * kStraightSin);
 }
 bool WagnerTorusGraphsLib::IsStraight(NodeTriangle tri) {
   return IsStraight(nodelist_vector_[tri[0]].xy_coord_, nodelist_vector_[tri[1]].xy_coord_, nodelist_vector_[tri[2]].xy_coord_);

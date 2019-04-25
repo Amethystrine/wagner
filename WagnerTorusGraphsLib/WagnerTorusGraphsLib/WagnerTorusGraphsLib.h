@@ -15,22 +15,26 @@ struct NodePair {NodeIndex nodeA; NodeIndex nodeB;};
 using NodeTriangle = NodeIndex[3];
 using NodeQuadrangle = NodeIndex[4];
 
-// 各種(関数に対応したパラメータポインタ, xy_coord_(点別二次元情報), infoparam_(点別個別情報))が送られる
-using DiagonalVerifyFunc = bool(*)(void*, Vec2d[4], void* [4]);
-using GetNodeFunc = void(*)(void*, Vec2d, void*);
-using GetEdgeFunc = void(*)(void*, Vec2d[2], void* [2]);
-using GetTriangleFunc = void(*)(void*, Vec2d[3], void* [3]);
-
 const int kUndefined = -1;
-enum EdgeID { kPlane, kDefault, kUncuttable };  // エッジの接続情報。当サンプルでは、デフォルトと切断不可能のみ
-const EdgeID kUncuttableIDList[] = { kDefault, kUncuttable }; // 接続解除をさせないID
-const EdgeID kInvertIDList[][2] = { {kDefault,kDefault} };  // 二点で対照的に与えたいID(2019/04/17 : 現在は対としている属性はないため仮の者のみ入れている）
+enum EdgeID { kPlane, kDefault, kUncuttable, kDirectedGraph_Initial, kDirectedGraph_Terminal };  // エッジの接続情報。当サンプルでは、デフォルトと切断不可能のみ
+const EdgeID kUncuttableIDList[] = { kDefault, kUncuttable, kDirectedGraph_Initial, kDirectedGraph_Terminal }; // 接続解除をさせないID
+const EdgeID kInvertIDList[][2] = { {kDirectedGraph_Initial, kDirectedGraph_Terminal} };  // 二点で対照的に与えたいID(2019/04/17 : 現在は対としている属性はないため仮の者のみ入れている）
 enum TransJudge { kVerify, kMustTrans, kMustNotTrans };
 
 const int kDefaultThreeNode = 3; //なにも点を登録しなくても、予約された点が三点存在することをコード上で説明する
 const double kSameLocationDist = 1e-8;  // X方向Y方向共にこの値未満のXY距離は同一点とみなす
 const double kCoordLimit = 100;  // 2次元平面の取りうる座標絶対値の最大（大きすぎると計算に失敗する）
 const int kSqrtMaxTransCountStopper = 30000;  // 対角変形を行う回数の上限の平方根。intの上限を超えないようにする
+const double kStraightSin = 1e-15;
+
+
+// 各種(関数に対応したパラメータポインタ, xy_coord_(点別二次元情報), infoparam_(点別個別情報))が送られる
+using DiagonalVerifyFunc = bool(*)(void*, Vec2d[4], void* [4]);
+using GetNodeFunc = void(*)(void*, Vec2d, void*);
+using GetEdgeFunc = void(*)(void*, Vec2d[2], void* [2], EdgeID);
+using GetTriangleFunc = void(*)(void*, Vec2d[3], void* [3], EdgeID[3]);
+
+
 
 // ノード情報。データ運搬用構造体として基本的にpublicで扱う
 class NodeInfo {
@@ -61,6 +65,15 @@ public:
   inline EdgeID GetID(EdgeIndex edge) {
     return accessidlist_vector_[(edge + accessnodelist_vector_.size()) % accessnodelist_vector_.size()];
   }
+  inline EdgeID GetID(NodeIndex node) {
+    EdgeIndex edge = GetEdge(node);
+    if (edge == kUndefined) {
+      printf("GetIDError\n");
+      return kPlane;
+    }
+    return GetID(edge);
+  }
+
   // 該当するEdgeLine要素数の直後に、エッジを追加
   void AddEdge(NodeIndex node, EdgeID ID, EdgeIndex edge) {
     accessnodelist_vector_.insert(accessnodelist_vector_.begin() + edge, node);

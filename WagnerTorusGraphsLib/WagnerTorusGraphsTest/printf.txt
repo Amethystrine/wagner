@@ -5,3 +5,13 @@ test4:
 area10:0.607714
 area100:0.915665
 1ms
+ConnectedFailed : Other Edge Blocked?
+test1:90ms
+test2:test1:2ms
+test2:4195ms
+test3:30ms
+test4:
+area10:0.607714
+area100:0.915665
+1ms
+test5:24ms
